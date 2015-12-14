@@ -101,6 +101,35 @@ extension JSON {
 
         return JSON(object: nil)
     }
+    
+    public subscript(path indexes: Any...) -> JSON {
+        return self[indexes]
+    }
+    
+    public subscript(indexes: [Any]) -> JSON {
+        if object == nil { return self }
+        
+        var json = self
+        
+        for index in indexes {
+            if let string = index as? String, object = json.nsDictionary?[string] {
+                json = JSON(object)
+                continue
+            }
+            
+            if let int = index as? Int, object = json.nsArray?[safe: int] {
+                json = JSON(object)
+                continue
+            }
+                
+            else {
+                json = JSON(nil)
+                break
+            }
+        }
+        
+        return json
+    }
 }
 
 // MARK: String
@@ -195,9 +224,9 @@ private extension JSON {
 public class JSONKeys {}
 
 public class JSONKey<ValueType>: JSONKeys {
-    public let _key: String
+    private let _key: [Any]
     
-    public init(_ key: String) {
+    public init(_ key: Any...) {
         self._key = key
     }
 }

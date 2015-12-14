@@ -78,10 +78,32 @@ class JASONTests: XCTestCase {
         XCTAssertEqual(4.2, json[.optionalFloat])
         XCTAssertEqual(true, json[.bool])
         XCTAssertEqual(true, json[.optionalBool])
-        XCTAssertEqualArrays(["string", 42, 4.2, true], json[.array])
+        XCTAssertEqualArrays(["string", 42, 4.2, true], json["array"].arrayValue)
         XCTAssertEqualArrays(["string", 42, 4.2, true], json[.optionalArray]!)
         XCTAssertEqualDictionaries(["string": 42], json[.dictionary])
         XCTAssertEqualDictionaries(["string": 42], json[.optionalDictionary])
+    }
+    
+    func testPath() {
+        let json: JSON = [
+            "results": [
+                ["id": 1],
+                ["id": 2]
+            ]
+        ]
+        
+        let nestedKey = JSONKey<Int>("results", 0, "id")
+        XCTAssertEqual(1, json[nestedKey])
+        
+        let id1 = json[path: "results", 0, "id"].intValue
+        XCTAssertEqual(1, id1)
+        
+        let none = json[path: "none", 0, "id"].intValue
+        XCTAssertEqual(0, none)
+        
+        let array: JSON = [[42, 43], [45, 46]]
+        let fourty5 = array[path: 1, 0].intValue
+        XCTAssertEqual(45, fourty5)
     }
 
     func testInitWithObject() {
